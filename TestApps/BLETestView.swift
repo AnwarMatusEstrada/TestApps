@@ -5,41 +5,62 @@ internal import Combine
 
 struct BLETestView: View {
     
-    @StateObject private var ble: BLE = BLE()
+    //@StateObject private var ble: BLE = BLE()
+    @StateObject var recvData = BLE.shared
+    
     @State var sta: String = ""
+    @State var fin: String = ""
     @State var r: Bool = false
+    @State var tokens: Set<AnyCancellable> = []
     
     var body: some View {
         VStack{
-            Button("Iniciar mediciones") {
-                ble.sign = "Start"
+            Button("Initiate meditions") {
+                recvData.sign = "Start"
                 if r == false {
-                    ble.TimerToggle()
+                    recvData.Conn()
+                    recvData.TimerToggle()
                 }
                 r = true
-                sta = "\(ble.centralManager.state)"
+                sta = "\(recvData.centralManager.state)"
             }
-            Text(ble.fin).padding(10)
+            Text(fin).padding(10)
             Text(sta)
             
-            Button("Detener mediciones") {
+            Button("Stop meditions") {
                 
-                ble.sign = "Stop"
+                recvData.sign = "Stop"
+                fin = "- -"
                 r = false
-                ble.TimerToggle()
+                recvData.TimerToggle()
             }
             Button("Reset Bluetooth") {
-                ble.sign = "Start"
-                ble.fin = "Resetting"
-                r = true
-                ble.restart()
+                recvData.sign = "Start"
+                fin = "Resetting..."
+                r = false
+                recvData.restart()
+                fin = "Wait and press initiate"
             }
+        }.onAppear {
+            observe()
         }
+    }
+
+    func observe() {
+        recvData.BLEPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                print("Handle \(completion) for error and finished subscription.")
+            } receiveValue: { FIN in
+                self.fin = FIN
+            }
+            .store(in: &tokens)
     }
 }
 
 class BLE: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, ObservableObject{
     
+    var BLEPublisher = PassthroughSubject<String, Error>()
     
     var centralManager : CBCentralManager!
     var peripheral_s: CBPeripheral!
@@ -48,20 +69,17 @@ class BLE: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, ObservableO
         centralManager = CBCentralManager(delegate: nil, queue: nil)
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.global())
-        
     }
-    @Published var chara: [CBCharacteristic] = []
+    static let shared = BLE()
+    
+    var chara: [CBCharacteristic] = []
     @Published var sign: String = ""
-    @Published var fin: String = "- -"
     @Published var timer: Timer = Timer()
     
     
-    @objc func restart() {
-        //centralManager.cancelPeripheralConnection(peripheral_s)
+    func restart() {
         self.centralManager = CBCentralManager(delegate: nil, queue: nil)
         self.centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.global())
-        Conn()
-        TimerToggle()
     }
     
     func TimerToggle() {
@@ -75,19 +93,19 @@ class BLE: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, ObservableO
         if sign == "Stop" {
             timer.invalidate()
             print("Invalidated Timer")
-            fin = "- -"
         }
     }
     
     @objc func ActivityStart() {
-        if chara.isEmpty {
-            restart()
-        } else {
-            let chara1 = chara.first
-            let chara2 = chara.last
+        if sign != "Stop" {
+            while chara.isEmpty {
+                print("empty chara")
+            }
+            let chara1 = chara.first!
+            let chara2 = chara.last!
             let msg: String = "$\(sign)$"
-            peripheral_s.setNotifyValue(true, for: chara1!)
-            peripheral_s.writeValue(msg.data(using: .utf8)!, for: chara2!, type: .withResponse)
+            peripheral_s.setNotifyValue(true, for: chara1)
+            peripheral_s.writeValue(msg.data(using: .utf8)!, for: chara2, type: .withResponse)
         }
     }
     
@@ -130,7 +148,8 @@ class BLE: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, ObservableO
             //print("\(peripheral) =? \(peripheral)")
             peripheral_s = peripheral
             peripheral_s.delegate = self
-            Conn()
+            //let FIN = "\(peripheral_s.identifier)"
+            //BLEPublisher.send(FIN)
         }
     }
     func centralManager(_ central: CBCentralManager, didConnect peripheral_s: CBPeripheral) {
@@ -161,25 +180,32 @@ class BLE: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, ObservableO
     }
     
     func peripheral(_ peripheral_s: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) {
+        //BLEPublisher.send(service.characteristics!)
         chara = service.characteristics!
+        //BLEPublisher.send(service.characteristics!)
+        //publish(asgn: chara, data:service.characteristics!)
         //print("Characteristic: \(chara!)")
         //[<CBCharacteristic: 0x12e14a1c0, UUID = 6E400003-B5A3-F393-E0A9-E50E24DCCA9E, properties = 0x12, value = (null), notifying = NO>, <CBCharacteristic: 0x12e148a80, UUID = 6E400002-B5A3-F393-E0A9-E50E24DCCA9E, properties = 0xC, value = (null), notifying = NO>]
     }
   
     func peripheral(_ peripheral_s: CBPeripheral, didUpdateValueFor chara1: CBCharacteristic, error: Error?) {
-        let datas = chara1.value
-        let byteData = Data(datas!)
-        fin = String(data: byteData, encoding: .utf8)!
-        print(fin)
+        //let datas = chara1.value
+        //let byteData = Data(datas!)
+        let FIN = String(data: Data(chara1.value!), encoding: .utf8)!
+        BLEPublisher.send(FIN)
+        print(FIN)
+        //publish(asgn: fin, data: String(data: byteData, encoding: .utf8)! )
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral_s: CBPeripheral, error: (any Error)?) {
-        fin = "Failed to connect"
+        let FIN = "Failed to connect"
+        BLEPublisher.send(FIN)
         restart()
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral_s: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) {
-        fin = "Disconnected"
+        let FIN = "Disconnected"
+        BLEPublisher.send(FIN)
         if isReconnecting {
             Conn()
         } else {
@@ -187,4 +213,5 @@ class BLE: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, ObservableO
         }
     }
 }
+
 
