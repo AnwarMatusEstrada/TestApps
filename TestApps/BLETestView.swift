@@ -15,6 +15,7 @@ struct BLETestView: View {
     @State var coordinates: (lat: Double, lon: Double) = (0, 0)
     @State var tokens: Set<AnyCancellable> = []
     @State var fn: String = "default.csv"
+    @State var maxread: Int = 100000
     
     var body: some View {
         VStack{
@@ -46,9 +47,18 @@ struct BLETestView: View {
                 recvData.restart()
                 fin = "Wait and press initiate"
             }
+            
+            Text("Inserte el numero de mediciones a graficar (Max Todas las del dia)").padding(10).keyboardType(.numberPad).background(.gray.opacity(0.3))
+                .cornerRadius(5)
+            TextField("", value: $maxread, format: .number).padding(10).keyboardType(.numberPad).background(.indigo.opacity(0.3))
+                .cornerRadius(5)
+            
             NavigationStack{
-                NavigationLink(destination:{MapView(fn: $fn)}){
+                NavigationLink(destination:{MapView(fn: $fn, maxread: $maxread)}){
                     Text("Map")
+                }
+                NavigationLink(destination:{MenuArchView(fn: $fn, maxread: $maxread)}){
+                    Text("Select file")
                 }
             }
         }.onAppear {
