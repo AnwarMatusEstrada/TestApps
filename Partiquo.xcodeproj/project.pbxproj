@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C7B5B01F2EF7FD4E00D02364 /* Exceptions for "TestApps" folder in "TestApps" target */ = {
+		C7B5B01F2EF7FD4E00D02364 /* Exceptions for "Partiquo" folder in "TestApps" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -21,12 +21,12 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C7F9E73A2EF5BA03001A2A03 /* TestApps */ = {
+		C7F9E73A2EF5BA03001A2A03 /* Partiquo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				C7B5B01F2EF7FD4E00D02364 /* Exceptions for "TestApps" folder in "TestApps" target */,
+				C7B5B01F2EF7FD4E00D02364 /* Exceptions for "Partiquo" folder in "TestApps" target */,
 			);
-			path = TestApps;
+			path = Partiquo;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -45,7 +45,7 @@
 		C7F9E72F2EF5BA03001A2A03 = {
 			isa = PBXGroup;
 			children = (
-				C7F9E73A2EF5BA03001A2A03 /* TestApps */,
+				C7F9E73A2EF5BA03001A2A03 /* Partiquo */,
 				C7F9E7392EF5BA03001A2A03 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,7 +74,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				C7F9E73A2EF5BA03001A2A03 /* TestApps */,
+				C7F9E73A2EF5BA03001A2A03 /* Partiquo */,
 			);
 			name = TestApps;
 			packageProductDependencies = (
@@ -272,6 +272,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TestApps/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Partiquo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "To comunicate with the device";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "To localize in maps";
@@ -288,7 +289,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ame.TestApps;
+				PRODUCT_BUNDLE_IDENTIFIER = ame.partiquo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -310,6 +311,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TestApps/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Partiquo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "To comunicate with the device";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "To localize in maps";
@@ -326,7 +328,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ame.TestApps;
+				PRODUCT_BUNDLE_IDENTIFIER = ame.partiquo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

@@ -15,7 +15,7 @@ struct BLETestView: View {
     @State var coordinates: (lat: Double, lon: Double) = (0, 0)
     @State var tokens: Set<AnyCancellable> = []
     @State var fn: String = "default.csv"
-    @State var maxread: Int = 1000
+    @State var maxread: Int = 3600
     @State var showAlert:Bool = false
     @State var peris: [CBPeripheral] = []
     @State var names: [String] = []
@@ -28,32 +28,41 @@ struct BLETestView: View {
     var body: some View {
         VStack{
             
+            Text("Monitoreo de PM").bold()
+                .padding(10)
+            
             HStack{
-                Text("Monitoreo de PM")
                 Button("RetraerTeclado") {
                     nameIsFocused = false
-                }
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
-            
-            HStack {
-                Text("Seleccione su ESP").keyboardType(.numberPad).background(.gray.opacity(0.3))
+                }.foregroundStyle(Color.letraBott)
+                    .padding(10)
+                    .background(Color.bkBott)
                     .cornerRadius(5)
+                    .frame(maxWidth: 135, maxHeight: 25, alignment: .trailing)
+            }.frame(maxWidth: 135, maxHeight: 25, alignment: .trailing)
+            HStack {
+                Text("Seleccione su ESP").keyboardType(.numberPad).padding(10)
+                    .background(.bkLetr.opacity(0.3))
+                    .cornerRadius(5)
+                    .foregroundStyle(Color.letra)
                 Picker("Selecciona un dispositivo:", selection: $name) {
                     Text("\(names)")
                     ForEach(names, id: \.self) { name in
                         Text(name).tag(name) }
-                }.pickerStyle(.menu).frame(width: 300, height: 100)
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                }.pickerStyle(.menu)
+            }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             
-            HStack{
-                Text("Inserte el no de seg entre mediciones").padding(10).keyboardType(.numberPad).background(.gray.opacity(0.3))
+            HStack (spacing: 20){
+                Text("Inserte el no de seg entre mediciones").keyboardType(.numberPad).padding(10)
+                    .background(.bkLetr.opacity(0.3))
                     .cornerRadius(5)
+                    .foregroundStyle(Color.letra)
                 TextField("", value: $Seg, format: .number).keyboardType(.numberPad).background(.indigo.opacity(0.3))
-                    .cornerRadius(5).focused($nameIsFocused)
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .cornerRadius(5).focused($nameIsFocused).frame(maxWidth: 40, maxHeight: .infinity)
+            }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             
             HStack{
-                VStack{
+                VStack (spacing: 20) {
                     Button("Initiate meditions") {
                         recvData.sign = "Start"
                         selectDev()
@@ -70,52 +79,58 @@ struct BLETestView: View {
                             fin = "Seleccione un dispositivo valido"
                         }
                         //sta = "\(recvData.centralManager.state)"
-                    }
+                    }.foregroundStyle(Color.letraBott).padding(10).background(Color.bkBott).cornerRadius(5)
                     
                     Button("Stop meditions") {
                         
                         recvData.sign = "Stop"
                         fin = "- -"
                         recvData.TimerToggle(seg: Seg)
-                    }
+                    }.foregroundStyle(Color.letraBott).padding(10).background(Color.bkBott).cornerRadius(5)
                 }
-                Text(fin)
-
+                Text(fin).foregroundStyle(.resul)
+                
             }.frame(maxWidth: .infinity, minHeight: 120)
             
             //Text("\(coordinates.lat)")
             //Text("\(coordinates.lon)")
             //Text(sta)
             
-            HStack{
-                Text("Si su ESP no aparece, presione Reset").keyboardType(.numberPad).background(.gray.opacity(0.3))
+            HStack (spacing: 20){
+                Text("Si su ESP no aparece, presione Reset").keyboardType(.numberPad).padding(10)
+                    .background(.bkLetr.opacity(0.3))
                     .cornerRadius(5)
+                    .foregroundStyle(Color.letra)
                 Button("Reset Bluetooth") {
                     recvData.sign = "Start"
                     fin = "Resetting..."
                     recvData.restart()
                     fin = "Wait and press initiate"
-                }
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                }.foregroundStyle(Color.letraBott).padding(10).background(Color.bkBott).cornerRadius(5)
+            }.frame(maxWidth: 300, maxHeight: .infinity, alignment: .center)
             
-            HStack{
-                Text("Inserte el numero de mediciones a graficar (Max Todas las del dia)").keyboardType(.numberPad).background(.gray.opacity(0.3))
+            HStack (spacing: 20){
+                Text("Inserte el numero de mediciones a graficar (Max Todas las del dia)").keyboardType(.numberPad).padding(10)
+                    .background(.bkLetr.opacity(0.3))
                     .cornerRadius(5)
+                    .foregroundStyle(Color.letra)
                 TextField("", value: $maxread, format: .number).keyboardType(.numberPad).background(.indigo.opacity(0.3))
-                    .cornerRadius(5).focused($nameIsFocused)
+                    .cornerRadius(5).focused($nameIsFocused).frame(maxWidth: 80, maxHeight: .infinity)
                 
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            
             NavigationStack{
-                NavigationLink(destination:{MapView(fn: fn, maxread: $maxread)}){
-                    Text("Map")
-                }.frame(maxWidth: .infinity, maxHeight: 15)
-                
-                NavigationLink(destination:{MenuArchView(maxread: $maxread)}){
-                    Text("Select file")
-                }.frame(maxWidth: .infinity, maxHeight: 15)
-
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
-                
+                HStack(spacing: 150) {
+                    NavigationLink(destination:{MapView(fn: fn, maxread: $maxread)}){
+                        Text("Map")
+                    }.foregroundStyle(Color.letraBott).padding(10).background(Color.bkBott).cornerRadius(5)
+                    
+                    NavigationLink(destination:{MenuArchView(maxread: $maxread)}){
+                        Text("Select file")
+                    }.foregroundStyle(Color.letraBott).padding(10).background(Color.bkBott).cornerRadius(5)
+                    
+                }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            }
         }.onAppear {
             observe()
             recvData.requestLocationUpdates()
@@ -126,9 +141,8 @@ struct BLETestView: View {
             }
         } message: {
             Text(fin)
-        }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.bkGnd)
+        }.frame(maxWidth: .infinity, maxHeight: .infinity).background(.bkGnd)
     }
-
     
     func writeToHist(msg: Data, fname: String) -> Bool{
         let Dir: URL = DocDir()

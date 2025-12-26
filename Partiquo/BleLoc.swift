@@ -38,8 +38,9 @@ class BLE: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, CLLocationM
     func requestLocationUpdates() {
         switch locationManager.authorizationStatus {
         case .notDetermined:
-            locationManager.requestWhenInUseAuthorization( )
+            locationManager.requestAlwaysAuthorization()
         case .authorizedWhenInUse, .authorizedAlways:
+            locationManager.requestAlwaysAuthorization()
             locationManager.startUpdatingLocation()
         default:
             break
